@@ -1,5 +1,7 @@
 const phoneMask = IMask(document.getElementById('phone'), {
   mask: '+{7}(000)000-00-00'
+  maxLength: 10  // Явное ограничение длины
+
 });
 
 document.getElementById('prizeForm').addEventListener('submit', function(e) {
