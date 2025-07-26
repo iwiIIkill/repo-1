@@ -41,64 +41,76 @@ document.getElementById('prizeForm').addEventListener('submit', function(e) {
 });
 
 // Конфетти
-document.addEventListener('DOMContentLoaded', function() {
-  const canvas = document.getElementById('confetti');
-  const ctx = canvas.getContext('2d');
-  
-  // Устанавливаем правильные размеры canvas
-  function resizeCanvas() {
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
-  }
-  
-  // Инициализация при загрузке
-  resizeCanvas();
-  window.addEventListener('resize', resizeCanvas);
+const canvas = document.getElementById('confetti');
+const ctx = canvas.getContext('2d');
 
-  // Создаем частицы конфетти
-  let particles = [];
-  const particleCount = 150; // Уменьшено для производительности
-  
-  for (let i = 0; i < particleCount; i++) {
-    particles.push({
-      x: Math.random() * canvas.width,
-      y: Math.random() * canvas.height - canvas.height,
-      r: Math.random() * 4 + 1,
-      d: Math.random() * particleCount + 10,
-      color: `hsl(${Math.random() * 360}, 100%, 50%)`,
-      tilt: Math.random() * 10 - 5,
-      tiltAngle: Math.random() * 0.1,
-      tiltAngleIncrement: Math.random() * 0.01 + 0.01
-    });
-  }
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
 
-  // Функция отрисовки
-  function draw() {
+const particles = [];
+const colors = ['#ff0000', '#00ff00', '#0000ff', '#ffff00', '#ff00ff', '#00ffff'];
+
+function createParticles() {
+    for (let i = 0; i < 150; i++) {
+        particles.push({
+            x: Math.random() * canvas.width,
+            y: Math.random() * canvas.height - canvas.height,
+            size: Math.random() * 8 + 3,
+            color: colors[Math.floor(Math.random() * colors.length)],
+            speed: Math.random() * 3 + 1,
+            angle: Math.random() * Math.PI * 2,
+            rotation: Math.random() * 0.2 - 0.1,
+            tilt: Math.random() * 10 - 5
+        });
+    }
+}
+
+function updateParticles() {
+    for (let i = 0; i < particles.length; i++) {
+        const p = particles[i];
+        p.y += p.speed;
+        p.angle += p.rotation;
+        p.tilt = Math.sin(p.angle) * 15;
+        
+        if (p.y > canvas.height) {
+            p.y = -10;
+            p.x = Math.random() * canvas.width;
+        }
+    }
+}
+
+function drawParticles() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     
     particles.forEach(p => {
-      ctx.beginPath();
-      ctx.moveTo(p.x + p.tilt + p.r/2, p.y);
-      ctx.lineTo(p.x + p.tilt, p.y + p.tilt + p.r/2);
-      ctx.strokeStyle = p.color;
-      ctx.lineWidth = p.r;
-      ctx.stroke();
-      
-      // Обновляем позицию
-      p.tiltAngle += p.tiltAngleIncrement;
-      p.y += (Math.cos(p.d) + 1 + p.r/2) / 2;
-      p.tilt = Math.sin(p.tiltAngle) * 15;
-      
-      // Если частица упала, создаем новую вверху
-      if(p.y > canvas.height) {
-        p.y = -10;
-        p.x = Math.random() * canvas.width;
-      }
+        ctx.save();
+        ctx.translate(p.x, p.y);
+        ctx.rotate(p.angle);
+        
+        ctx.fillStyle = p.color;
+        ctx.beginPath();
+        ctx.rect(-p.size/2, -p.size/2, p.size, p.size);
+        ctx.fill();
+        
+        ctx.restore();
     });
-    
-    requestAnimationFrame(draw);
-  }
+}
 
-  // Запускаем анимацию
-  draw();
+function animate() {
+    updateParticles();
+    drawParticles();
+    requestAnimationFrame(animate);
+}
+
+// Запускаем все
+createParticles();
+animate();
+
+// Ваш текущий код для формы остается без изменений
+const phoneMask = IMask(document.getElementById('phone'), {
+    mask: '+{7}(000)000-00-00'
+});
+
+document.getElementById('prizeForm').addEventListener('submit', function(e) {
+    // Ваш текущий код обработки формы
 });
