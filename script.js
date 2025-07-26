@@ -2,21 +2,21 @@ const phoneMask = IMask(document.getElementById('phone'), {
   mask: '+{7}(000)000-00-00'
 });
 
-document.getElementById('prizeForm').addEventListener('submit', function (e) {
+document.getElementById('prizeForm').addEventListener('submit', function(e) {
   e.preventDefault();
   const name = this.name.value.trim();
-  const phoneRaw = '+7' + phoneMask.unmaskedValue.slice(1);
+  const phoneRaw = '+7' + (phoneMask.unmaskedValue || '').slice(1);
   const messageEl = document.getElementById('message');
 
   const numeric = phoneRaw.replace(/\D/g, '');
 
-  if (numeric.length !== 11  !numeric.startsWith('7')) {
+  if (numeric.length !== 11 || !numeric.startsWith('7')) {
     messageEl.textContent = 'Введите корректный номер в формате +7XXXXXXXXXX';
     messageEl.style.color = 'red';
     return;
   }
 
-  fetch('https://proxylast.onrender.com', {
+  fetch('https://repo-2-zffb.onrender.com', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ name, phone: phoneRaw })
@@ -28,7 +28,7 @@ document.getElementById('prizeForm').addEventListener('submit', function (e) {
         messageEl.style.color = 'green';
         this.reset();
       } else {
-        messageEl.textContent = 'Ошибка: ' + (data.error  'неизвестная ошибка');
+        messageEl.textContent = 'Ошибка: ' + (data.error || 'неизвестная ошибка');
         messageEl.style.color = 'red';
       }
     })
@@ -38,7 +38,7 @@ document.getElementById('prizeForm').addEventListener('submit', function (e) {
     });
 });
 
-// 🎉 Конфетти
+// Конфетти
 const canvas = document.getElementById('confetti');
 const ctx = canvas.getContext('2d');
 canvas.width = window.innerWidth;
@@ -49,7 +49,7 @@ let confetti = Array.from({ length: 300 }, () => ({
   y: Math.random() * canvas.height,
   r: Math.random() * 6 + 4,
   d: Math.random() * 20 + 10,
-  color: hsl(${Math.random() * 360}, 100%, 50%),
+  color: `hsl(${Math.random() * 360}, 100%, 50%)`,
   tilt: Math.random() * 10 - 10
 }));
 
