@@ -41,43 +41,64 @@ document.getElementById('prizeForm').addEventListener('submit', function(e) {
 });
 
 // Конфетти
-const canvas = document.getElementById('confetti');
-const ctx = canvas.getContext('2d');
-canvas.width = window.innerWidth;
-canvas.height = window.innerHeight;
+document.addEventListener('DOMContentLoaded', function() {
+  const canvas = document.getElementById('confetti');
+  const ctx = canvas.getContext('2d');
+  
+  // Устанавливаем правильные размеры canvas
+  function resizeCanvas() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+  }
+  
+  // Инициализация при загрузке
+  resizeCanvas();
+  window.addEventListener('resize', resizeCanvas);
 
-let confetti = Array.from({ length: 300 }, () => ({
-  x: Math.random() * canvas.width,
-  y: Math.random() * canvas.height,
-  r: Math.random() * 6 + 4,
-  d: Math.random() * 20 + 10,
-  color: `hsl(${Math.random() * 360}, 100%, 50%)`,
-  tilt: Math.random() * 10 - 10
-}));
+  // Создаем частицы конфетти
+  let particles = [];
+  const particleCount = 150; // Уменьшено для производительности
+  
+  for (let i = 0; i < particleCount; i++) {
+    particles.push({
+      x: Math.random() * canvas.width,
+      y: Math.random() * canvas.height - canvas.height,
+      r: Math.random() * 4 + 1,
+      d: Math.random() * particleCount + 10,
+      color: `hsl(${Math.random() * 360}, 100%, 50%)`,
+      tilt: Math.random() * 10 - 5,
+      tiltAngle: Math.random() * 0.1,
+      tiltAngleIncrement: Math.random() * 0.01 + 0.01
+    });
+  }
 
-function drawConfetti() {
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-  confetti.forEach(c => {
-    ctx.beginPath();
-    ctx.lineWidth = c.r;
-    ctx.strokeStyle = c.color;
-    ctx.moveTo(c.x + c.tilt + c.r / 2, c.y);
-    ctx.lineTo(c.x + c.tilt, c.y + c.tilt + c.d / 2);
-    ctx.stroke();
-  });
-  updateConfetti();
-  requestAnimationFrame(drawConfetti);
-}
+  // Функция отрисовки
+  function draw() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    
+    particles.forEach(p => {
+      ctx.beginPath();
+      ctx.moveTo(p.x + p.tilt + p.r/2, p.y);
+      ctx.lineTo(p.x + p.tilt, p.y + p.tilt + p.r/2);
+      ctx.strokeStyle = p.color;
+      ctx.lineWidth = p.r;
+      ctx.stroke();
+      
+      // Обновляем позицию
+      p.tiltAngle += p.tiltAngleIncrement;
+      p.y += (Math.cos(p.d) + 1 + p.r/2) / 2;
+      p.tilt = Math.sin(p.tiltAngle) * 15;
+      
+      // Если частица упала, создаем новую вверху
+      if(p.y > canvas.height) {
+        p.y = -10;
+        p.x = Math.random() * canvas.width;
+      }
+    });
+    
+    requestAnimationFrame(draw);
+  }
 
-function updateConfetti() {
-  confetti.forEach(c => {
-    c.y += Math.cos(c.d) + 1 + c.r / 2;
-    c.x += Math.sin(0.01);
-    if (c.y > canvas.height) {
-      c.y = -10;
-      c.x = Math.random() * canvas.width;
-    }
-  });
-}
-
-drawConfetti();
+  // Запускаем анимацию
+  draw();
+});
