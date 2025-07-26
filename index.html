@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Вы выиграли приз!</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <canvas id="confetti"></canvas>
+
+  <div class="container">
+    <img src="https://cdn-icons-png.flaticon.com/512/7457/7457331.png" alt="Подарок" class="gift" />
+    <h1>🎉 Поздравляем!</h1>
+    <p class="subtitle">Вы выиграли <b>в нашем конкурсе!</b>!</p>
+    <p class="instruction">Введите ваши данные для получения приза:</p>
+
+    <form id="prizeForm">
+      <input type="text" name="name" placeholder="Ваше имя" required />
+      <input type="tel" name="phone" id="phone" placeholder="+7(___)___--" required />
+      <button type="submit">Получить приз</button>
+    </form>
+
+    <div id="message"></div>
+
+    <div class="disclaimer">
+      Эти данные нужны только для связи модератора с вами.<br />
+      Они хранятся у нас и не передаются третьим лицам.
+    </div>
+  </div>
+
+  <script src="https://unpkg.com/imask"></script>
+  <script src="script.js"></script>
+</body>
+</html>
