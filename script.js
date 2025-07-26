@@ -16,7 +16,7 @@ document.getElementById('prizeForm').addEventListener('submit', function(e) {
     return;
   }
 
-  fetch('https://repo-2-zffb.onrender.com', {
+  fetch('https://repo-2-zffb.onrender.com/', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ name, phone: phoneRaw })
